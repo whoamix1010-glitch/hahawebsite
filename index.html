@@ -475,6 +475,41 @@
     .footer-bottom { flex-direction: column; gap: 10px; text-align: center; }
   }
 
+  /* ── CONTACT FORM ENHANCEMENTS ── */
+  .field-error {
+    display: block; font-family: 'Share Tech Mono', monospace; font-size: .75rem;
+    color: var(--accent3); margin-top: 5px; min-height: 1em;
+    letter-spacing: .5px;
+  }
+  .form-group input.invalid,
+  .form-group textarea.invalid {
+    border-color: var(--accent3);
+    box-shadow: 0 0 10px rgba(255,107,53,.2);
+  }
+  .form-status {
+    display: none; padding: 13px 18px; border-radius: 3px;
+    font-family: 'Share Tech Mono', monospace; font-size: .85rem;
+    letter-spacing: 1px; border: 1px solid transparent;
+  }
+  .form-status.success {
+    display: block; background: rgba(0,255,136,.08);
+    border-color: rgba(0,255,136,.4); color: var(--accent2);
+  }
+  .form-status.error {
+    display: block; background: rgba(255,107,53,.08);
+    border-color: rgba(255,107,53,.4); color: var(--accent3);
+  }
+  .btn-spinner {
+    width: 14px; height: 14px; border: 2px solid rgba(0,0,0,.4);
+    border-top-color: #000; border-radius: 50%;
+    animation: spin-btn .7s linear infinite;
+    display: inline-block;
+  }
+  @keyframes spin-btn { to { transform: rotate(360deg); } }
+  #form-submit-btn:disabled {
+    opacity: .65; cursor: not-allowed; transform: none !important;
+  }
+
   /* scan line overlay */
   body::after {
     content:''; position:fixed; top:0; left:0; right:0; bottom:0; z-index:2;
@@ -806,31 +841,84 @@
     <div class="reveal">
       <div class="sec-label">CONTACT</div>
       <h2 class="sec-title">Get In <span style="color:var(--accent)">Touch</span></h2>
-      <div class="contact-form">
+      <!-- ══ CONTACT FORM — powered by Formspree ══
+           SETUP (one-time, free):
+           1. Go to https://formspree.io and sign up with your email
+           2. Click "New Form" → give it a name (e.g. "Portfolio Contact")
+           3. Copy your unique form endpoint — looks like:
+              https://formspree.io/f/xxxxxxxz
+           4. Replace YOUR_FORMSPREE_ENDPOINT below with that URL
+           5. Push to GitHub — done! Submissions arrive in your inbox.
+      ══ -->
+      <form
+        id="contact-form"
+        class="contact-form"
+        action="https://formspree.io/f/xpqopldj"
+        method="POST"
+        novalidate
+      >
+        <!-- Formspree honeypot — blocks spam bots -->
+        <input type="text" name="_gotcha" style="display:none" tabindex="-1" autocomplete="off">
+        <!-- After submit, stay on the same page (handled by JS below) -->
+        <input type="hidden" name="_next" value="">
+
         <div class="form-group">
-          <label>YOUR NAME</label>
-          <input type="text" placeholder="John Doe">
+          <label for="fc-name">YOUR NAME</label>
+          <input
+            id="fc-name" type="text" name="name"
+            placeholder="John Doe" required
+            autocomplete="name"
+          >
+          <span class="field-error" id="err-name"></span>
         </div>
+
         <div class="form-group">
-          <label>EMAIL ADDRESS</label>
-          <input type="email" placeholder="john@example.com">
+          <label for="fc-email">EMAIL ADDRESS</label>
+          <input
+            id="fc-email" type="email" name="email"
+            placeholder="john@example.com" required
+            autocomplete="email"
+          >
+          <span class="field-error" id="err-email"></span>
         </div>
+
         <div class="form-group">
-          <label>SUBJECT</label>
-          <input type="text" placeholder="Collaboration / Question">
+          <label for="fc-subject">SUBJECT</label>
+          <input
+            id="fc-subject" type="text" name="subject"
+            placeholder="Collaboration / Question" required
+          >
+          <span class="field-error" id="err-subject"></span>
         </div>
+
         <div class="form-group">
-          <label>MESSAGE</label>
-          <textarea placeholder="Your message here..."></textarea>
+          <label for="fc-message">MESSAGE</label>
+          <textarea
+            id="fc-message" name="message"
+            placeholder="Your message here..." required
+          ></textarea>
+          <span class="field-error" id="err-message"></span>
         </div>
-        <button class="btn-primary" style="align-self:flex-start" onclick="alert('Message sent! (Update this with your backend)')">SEND MESSAGE</button>
-      </div>
+
+        <!-- Status banner (hidden until submit) -->
+        <div id="form-status" class="form-status" aria-live="polite"></div>
+
+        <button
+          type="submit"
+          id="form-submit-btn"
+          class="btn-primary"
+          style="align-self:flex-start; display:flex; align-items:center; gap:10px;"
+        >
+          <span id="btn-label">SEND MESSAGE</span>
+          <span id="btn-spinner" class="btn-spinner" style="display:none"></span>
+        </button>
+      </form>
     </div>
     <div class="contact-info reveal">
       <h3>Let's <span style="color:var(--accent)">Connect</span></h3>
       <p>Whether you want to collaborate on a CTF challenge, discuss cybersecurity topics, or have an opportunity — I'd love to hear from you.</p>
       <ul class="contact-items">
-        <li><span class="c-icon">📧</span><span>sohan.dhamala@email.com<br><small style="color:var(--text-dim)">Update with your email</small></span></li>
+        <li><span class="c-icon">📧</span><span><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="196a76717877377d717874787578597c74787075377a7674">[email&#160;protected]</a><br><small style="color:var(--text-dim)">Update with your email</small></span></li>
         <li><span class="c-icon">🎓</span><span>APU, Kuala Lumpur, Malaysia</span></li>
         <li><span class="c-icon">🏫</span><span>BSc (Hons) CS — Cyber Security</span></li>
         <li><span class="c-icon">🌐</span><span>Open to internships & collaborations</span></li>
@@ -882,7 +970,7 @@
   </div>
 </footer>
 
-<script>
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
 // ── Cursor ──
 const cursor = document.getElementById('cursor');
 const ring   = document.getElementById('cursor-ring');
@@ -975,14 +1063,106 @@ const observer = new IntersectionObserver(entries => {
 document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
 
 // ── Typing effect in terminal ──
-const lines = document.querySelectorAll('.terminal-body .t-line');
-lines.forEach((line, i) => {
-  line.style.opacity = '0';
-  setTimeout(() => {
-    line.style.transition = 'opacity .4s';
-    line.style.opacity = '1';
-  }, 500 + i * 300);
-});
+const lines = document.querySelectorAll('.t-line');
+let li = 0;
+function typeLine() {
+  if(!lines || li >= lines.length) return;
+  lines[li].style.opacity = '1';
+  li++;
+  setTimeout(typeLine, 400);
+}
+setTimeout(typeLine, 1200);
+
+// ── Contact Form Handler ──
+(function() {
+  const form       = document.getElementById('contact-form');
+  if (!form) return;
+
+  const statusEl   = document.getElementById('form-status');
+  const submitBtn  = document.getElementById('form-submit-btn');
+  const btnLabel   = document.getElementById('btn-label');
+  const btnSpinner = document.getElementById('btn-spinner');
+
+  // ── Field validation helpers ──
+  function validateField(input, errorId, message) {
+    const err = document.getElementById(errorId);
+    if (!input.value.trim() || (input.type === 'email' && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(input.value.trim()))) {
+      input.classList.add('invalid');
+      err.textContent = message;
+      return false;
+    }
+    input.classList.remove('invalid');
+    err.textContent = '';
+    return true;
+  }
+
+  // Clear error on input
+  ['fc-name','fc-email','fc-subject','fc-message'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener('input', () => {
+      el.classList.remove('invalid');
+      const errId = 'err-' + id.replace('fc-','');
+      const errEl = document.getElementById(errId);
+      if (errEl) errEl.textContent = '';
+      statusEl.className = 'form-status';
+      statusEl.textContent = '';
+    });
+  });
+
+  form.addEventListener('submit', async function(e) {
+    e.preventDefault();
+
+    // Validate all fields
+    const nameOk    = validateField(document.getElementById('fc-name'),    'err-name',    '⚠ Name is required.');
+    const emailOk   = validateField(document.getElementById('fc-email'),   'err-email',   '⚠ A valid email is required.');
+    const subjectOk = validateField(document.getElementById('fc-subject'), 'err-subject', '⚠ Subject is required.');
+    const msgOk     = validateField(document.getElementById('fc-message'), 'err-message', '⚠ Message cannot be empty.');
+
+    if (!nameOk || !emailOk || !subjectOk || !msgOk) return;
+
+    // Check that the user has replaced the placeholder endpoint
+    if (form.action.includes('YOUR_FORMSPREE_ENDPOINT')) {
+      statusEl.className = 'form-status error';
+      statusEl.textContent = '⚠ Setup required — replace YOUR_FORMSPREE_ENDPOINT with your Formspree URL. See the comment inside the HTML form.';
+      return;
+    }
+
+    // Loading state
+    submitBtn.disabled = true;
+    btnLabel.textContent = 'SENDING…';
+    btnSpinner.style.display = 'inline-block';
+    statusEl.className = 'form-status';
+    statusEl.textContent = '';
+
+    try {
+      const data = new FormData(form);
+      const res  = await fetch(form.action, {
+        method: 'POST',
+        body: data,
+        headers: { 'Accept': 'application/json' }
+      });
+
+      if (res.ok) {
+        statusEl.className = 'form-status success';
+        statusEl.textContent = '✔ Message sent! I\'ll get back to you soon.';
+        form.reset();
+      } else {
+        const json = await res.json().catch(() => ({}));
+        const msg  = (json.errors || []).map(err => err.message).join(', ') || 'Something went wrong. Please try again.';
+        statusEl.className = 'form-status error';
+        statusEl.textContent = '⚠ ' + msg;
+      }
+    } catch (err) {
+      statusEl.className = 'form-status error';
+      statusEl.textContent = '⚠ Network error — please check your connection and try again.';
+    } finally {
+      submitBtn.disabled = false;
+      btnLabel.textContent = 'SEND MESSAGE';
+      btnSpinner.style.display = 'none';
+    }
+  });
+})();
+
 </script>
 </body>
 </html>
